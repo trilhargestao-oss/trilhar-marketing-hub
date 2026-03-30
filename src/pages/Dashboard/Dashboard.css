@@ -1,0 +1,129 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.welcome-text {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.welcome-sub {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.dash-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dash-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.dash-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border-color);
+}
+.dash-stat-row:last-child {
+  border-bottom: none;
+}
+
+.dash-stat-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.dash-stat-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.dash-shortcuts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.shortcut-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shortcut-btn:hover {
+  border-color: var(--color-primary);
+  background: rgba(124, 58, 237, 0.05);
+  transform: translateY(-2px);
+}
+
+.shortcut-icon {
+  color: var(--color-primary);
+}
+
+.today-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: var(--bg-input);
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary);
+}
+
+.today-item.published {
+  border-left-color: var(--color-success);
+}
+
+.today-time {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.today-title {
+  color: var(--text-secondary);
+  font-size: 14px;
+  flex: 1;
+}
