@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BarChart3, Heart, Bookmark, Eye, Plus, Globe, MessageSquare, Briefcase, Trash2, Users, MousePointerClick } from 'lucide-react';
+import { BarChart3, Heart, Eye, Plus, Globe, MessageSquare, Briefcase, Trash2, Users, MousePointerClick } from 'lucide-react';
 import { supabase } from '../../services/supabase';
 import './Metrics.css';
 
