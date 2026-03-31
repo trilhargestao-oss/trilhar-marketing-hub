@@ -40,7 +40,13 @@
 .metric-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+}
+
+.metric-sub-label {
+  font-size: 11px;
+  color: var(--color-success);
+  font-weight: 500;
 }
 
 .metric-label {
@@ -90,6 +96,10 @@
 
 .metrics-table tr:hover td {
   background: rgba(255, 255, 255, 0.02);
+}
+
+.metrics-table tr.row-highlight td {
+  background: rgba(16, 185, 129, 0.05);
 }
 
 .post-title-cell {

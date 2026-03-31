@@ -48,7 +48,12 @@ CREATE TABLE IF NOT EXISTS public.metrics (
   saves integer DEFAULT 0,
   comments integer DEFAULT 0,
   shares integer DEFAULT 0,
-  notes text
+  followers_gained integer DEFAULT 0,
+  followers_total integer DEFAULT 0,
+  profile_visits integer DEFAULT 0,
+  link_clicks integer DEFAULT 0,
+  notes text,
+  metric_type text DEFAULT 'post' -- 'post' ou 'account'
 );
 
 -- Tabela: goals (Metas)

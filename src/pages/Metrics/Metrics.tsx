@@ -14,9 +14,11 @@ interface MetricRecord {
   comments: number;
   shares: number;
   followers_gained: number;
+  followers_total: number;
   profile_visits: number;
   link_clicks: number;
   notes?: string;
+  metric_type: 'post' | 'account';
 }
 
 const Metrics = () => {
@@ -33,9 +35,11 @@ const Metrics = () => {
     comments: 0,
     shares: 0,
     followers_gained: 0,
+    followers_total: 0,
     profile_visits: 0,
     link_clicks: 0,
-    notes: ''
+    notes: '',
+    metric_type: 'post'
   });
 
   useEffect(() => {
@@ -66,9 +70,11 @@ const Metrics = () => {
       comments: 0,
       shares: 0,
       followers_gained: 0,
+      followers_total: records.length > 0 ? (records[0].followers_total || 0) : 0,
       profile_visits: 0,
       link_clicks: 0,
-      notes: ''
+      notes: '',
+      metric_type: 'post'
     });
     setIsModalOpen(true);
   };
@@ -82,7 +88,7 @@ const Metrics = () => {
       if (data) setRecords([data[0] as MetricRecord, ...records]);
       setIsModalOpen(false);
     } catch (err) {
-      alert('Erro ao salvar. Tem certeza que rodou os comandos SQL no Supabase para as colunas novas?');
+      alert('Erro ao salvar no banco de dados.');
     }
   };
 
@@ -100,7 +106,12 @@ const Metrics = () => {
   // Calcula totais
   const totalReach = records.reduce((acc, curr) => acc + (curr.reach || 0), 0);
   const totalLikes = records.reduce((acc, curr) => acc + (curr.likes || 0), 0);
-  const totalFollowers = records.reduce((acc, curr) => acc + (curr.followers_gained || 0), 0);
+  
+  // Para seguidores: O total mais recente da plataforma
+  const latestFollowersTotal = records.find(r => r.platform === 'Instagram')?.followers_total || 0;
+  // O ganho total histórico (soma de todos os ganhos registrados)
+  const totalFollowersGained = records.reduce((acc, curr) => acc + (curr.followers_gained || 0), 0);
+  
   const totalClicks = records.reduce((acc, curr) => acc + (curr.link_clicks || 0), 0);
   
   const avgReach = records.length ? Math.round(totalReach / records.length) : 0;
@@ -149,8 +160,9 @@ const Metrics = () => {
         <div className="metric-card">
           <div className="metric-icon-wrap" style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}><Users size={24} /></div>
           <div className="metric-info">
-            <span className="metric-label">Novos Seguidores</span>
-            <span className="metric-value">{totalFollowers.toLocaleString()}</span>
+            <span className="metric-label">Seguidores Totais</span>
+            <span className="metric-value">{latestFollowersTotal.toLocaleString()}</span>
+            <span className="metric-sub-label">+{totalFollowersGained} acumulados</span>
           </div>
         </div>
         <div className="metric-card">
@@ -174,25 +186,30 @@ const Metrics = () => {
               <th>Data</th>
               <th>Alcance</th>
               <th>Curtidas</th>
-              <th>Salvamentos</th>
-              <th>Seguidores</th>
-              <th>Visitas (P)</th>
+              <th>Novos Seg.</th>
+              <th>Total Seg.</th>
+              <th>Visitas</th>
               <th>Cliques</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {records.map(record => (
-              <tr key={record.id}>
+              <tr key={record.id} className={record.metric_type === 'account' ? 'row-highlight' : ''}>
                 <td className="post-title-cell">
                   {getPlatformIcon(record.platform)}
-                  {record.post_title}
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontWeight: 500 }}>{record.post_title}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+                      {record.metric_type === 'account' ? 'Status da Conta' : 'Métrica de Post'}
+                    </span>
+                  </div>
                 </td>
                 <td>{record.post_date}</td>
                 <td>{(record.reach || 0).toLocaleString()}</td>
                 <td>{(record.likes || 0).toLocaleString()}</td>
-                <td>{(record.saves || 0).toLocaleString()}</td>
                 <td style={{ color: 'var(--color-success)', fontWeight: 500 }}>+{(record.followers_gained || 0).toLocaleString()}</td>
+                <td style={{ fontWeight: 600 }}>{(record.followers_total || 0).toLocaleString()}</td>
                 <td>{(record.profile_visits || 0).toLocaleString()}</td>
                 <td>{(record.link_clicks || 0).toLocaleString()}</td>
                 <td>
@@ -218,9 +235,12 @@ const Metrics = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
               
               {/* Seção Básica */}
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label>Identificação do Post / Lote</label>
-                <input type="text" className="form-control" placeholder="Ex: Lançamento Post 1" value={formData.post_title} onChange={e => updateForm('post_title', e.target.value)} />
+              <div className="form-group">
+                <label>Tipo de Registro</label>
+                <select className="form-control" value={formData.metric_type} onChange={e => updateForm('metric_type', e.target.value)}>
+                  <option value="post">Métrica de Post Individual</option>
+                  <option value="account">Status Geral da Conta (Snapshot)</option>
+                </select>
               </div>
 
               <div className="form-group">
@@ -234,14 +254,19 @@ const Metrics = () => {
                 </select>
               </div>
 
+              <div className="form-group" style={{ gridColumn: formData.metric_type === 'account' ? '1 / -1' : 'auto' }}>
+                <label>{formData.metric_type === 'account' ? 'Nome do Snapshot' : 'Identificação do Post'}</label>
+                <input type="text" className="form-control" placeholder={formData.metric_type === 'account' ? "Ex: Status Geral Março" : "Ex: Lançamento Post 1"} value={formData.post_title} onChange={e => updateForm('post_title', e.target.value)} />
+              </div>
+
               <div className="form-group">
                 <label>Data de Referência</label>
                 <input type="date" className="form-control" value={formData.post_date} onChange={e => updateForm('post_date', e.target.value)} />
               </div>
 
-              {/* Seção Engajamento */}
+              {/* Seção Engajamento (Ocultar se for snapshot de conta para simplificar, ou deixar opcional) */}
               <div style={{ gridColumn: '1 / -1', borderBottom: '1px solid var(--border-color)', margin: '8px 0 4px', paddingBottom: '4px' }}>
-                <strong style={{ color: 'var(--color-primary)', fontSize: '14px' }}>Engajamento no Post</strong>
+                <strong style={{ color: 'var(--color-primary)', fontSize: '14px' }}>Engajamento e Alcance</strong>
               </div>
 
               <div className="form-group">
@@ -263,15 +288,15 @@ const Metrics = () => {
                 <label>Total de Salvamentos</label>
                 <input type="number" className="form-control" value={formData.saves} onChange={e => updateForm('saves', Number(e.target.value))} />
               </div>
-              
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label>Comentários Mapeados</label>
-                <input type="number" className="form-control" value={formData.comments} onChange={e => updateForm('comments', Number(e.target.value))} />
-              </div>
 
               {/* Seção Crescimento/Conta */}
               <div style={{ gridColumn: '1 / -1', borderBottom: '1px solid var(--border-color)', margin: '8px 0 4px', paddingBottom: '4px' }}>
-                <strong style={{ color: 'var(--color-success)', fontSize: '14px' }}>Crescimento do Perfil & Conversão</strong>
+                <strong style={{ color: 'var(--color-success)', fontSize: '14px' }}>Status da Audiência (Growth)</strong>
+              </div>
+
+              <div className="form-group">
+                <label>Seguidores Totais (Acumulado)</label>
+                <input type="number" className="form-control" style={{ borderColor: 'var(--color-success)' }} value={formData.followers_total} onChange={e => updateForm('followers_total', Number(e.target.value))} />
               </div>
 
               <div className="form-group">
@@ -284,8 +309,8 @@ const Metrics = () => {
                 <input type="number" className="form-control" value={formData.profile_visits} onChange={e => updateForm('profile_visits', Number(e.target.value))} />
               </div>
 
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label>Cliques no Link (Site/Bio)</label>
+              <div className="form-group">
+                <label>Cliques no Link (Bio)</label>
                 <input type="number" className="form-control" value={formData.link_clicks} onChange={e => updateForm('link_clicks', Number(e.target.value))} />
               </div>
 

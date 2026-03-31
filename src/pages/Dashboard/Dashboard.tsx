@@ -11,6 +11,7 @@ interface DashboardStats {
   publishedMonth: number;
   totalCopies: number;
   activeGoals: number;
+  latestFollowers: number;
 }
 
 const Dashboard = () => {
@@ -20,7 +21,8 @@ const Dashboard = () => {
     scheduledMonth: 0,
     publishedMonth: 0,
     totalCopies: 0,
-    activeGoals: 0
+    activeGoals: 0,
+    latestFollowers: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -62,12 +64,22 @@ const Dashboard = () => {
         .from('goals')
         .select('*', { count: 'exact', head: true });
 
+      // Fetch Latest Followers Metric
+      const { data: latestM } = await supabase
+        .from('metrics')
+        .select('followers_total')
+        .order('post_date', { ascending: false })
+        .limit(1);
+      
+      const lastF = latestM?.[0]?.followers_total || 0;
+
       setStats({
         todayPosts: todayP || [],
         scheduledMonth: scheduled,
         publishedMonth: published,
         totalCopies: copiesCount || 0,
-        activeGoals: goalsCount || 0
+        activeGoals: goalsCount || 0,
+        latestFollowers: lastF
       });
     } catch (err) {
       console.error('Erro ao carregar dashboard', err);
@@ -124,24 +136,24 @@ const Dashboard = () => {
           {/* Section 2: Resumo do Mês */}
           <div className="dash-section">
             <h3 className="dash-section-title">
-              <Target size={20} /> Visão Geral (Mês Atual)
+              <Target size={20} /> Visão Geral (Histórico)
             </h3>
             
             <div className="dash-stat-row">
-              <span className="dash-stat-label">Posts Agendados</span>
+              <span className="dash-stat-label">Seguidores Atuais</span>
+              <span className="dash-stat-value" style={{ color: 'var(--color-success)', fontWeight: 700 }}>{stats.latestFollowers.toLocaleString()}</span>
+            </div>
+            <div className="dash-stat-row">
+              <span className="dash-stat-label">Posts Agendados (Mês)</span>
               <span className="dash-stat-value" style={{ color: 'var(--color-primary)' }}>{stats.scheduledMonth}</span>
             </div>
             <div className="dash-stat-row">
-              <span className="dash-stat-label">Posts Publicados</span>
-              <span className="dash-stat-value" style={{ color: 'var(--color-success)' }}>{stats.publishedMonth}</span>
+              <span className="dash-stat-label">Posts Publicados (Mês)</span>
+              <span className="dash-stat-value">{stats.publishedMonth}</span>
             </div>
             <div className="dash-stat-row">
               <span className="dash-stat-label">Ideias e Copies salvas</span>
               <span className="dash-stat-value">{stats.totalCopies}</span>
-            </div>
-            <div className="dash-stat-row">
-              <span className="dash-stat-label">Metas Ativas</span>
-              <span className="dash-stat-value">{stats.activeGoals}</span>
             </div>
           </div>
 
