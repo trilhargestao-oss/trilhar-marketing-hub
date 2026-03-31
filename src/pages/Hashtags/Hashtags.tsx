@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Copy, Check, Trash2 } from 'lucide-react';
 import { supabase } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import './Hashtags.css';
 
 interface HashtagGroup {
@@ -11,6 +12,7 @@ interface HashtagGroup {
 }
 
 const Hashtags = () => {
+  const { user } = useAuth();
   const [groups, setGroups] = useState<HashtagGroup[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,7 @@ const Hashtags = () => {
 
   const addMockGroup = async () => {
     const newGroup = {
+      user_id: user?.id,
       name: 'Novo Grupo',
       description: 'Grupo gerado rapidamente',
       tags: ['#novo', '#marketing', '#instagram']

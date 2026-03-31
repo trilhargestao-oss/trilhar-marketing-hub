@@ -6,6 +6,7 @@ import {
 import { ptBR } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, X, Bell, CheckCircle } from 'lucide-react';
 import { supabase } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import './Calendar.css';
 
 interface Post {
@@ -21,6 +22,7 @@ interface Post {
 }
 
 const Calendar = () => {
+  const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -85,6 +87,7 @@ const Calendar = () => {
 
     try {
       const newPost = {
+        user_id: user?.id,
         title: formData.title,
         platform: formData.platform,
         type: formData.type,

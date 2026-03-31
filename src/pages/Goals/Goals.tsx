@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trophy, Trash2 } from 'lucide-react';
 import { supabase } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import './Goals.css';
 
 interface Goal {
@@ -14,6 +15,7 @@ interface Goal {
 }
 
 const Goals = () => {
+  const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -36,12 +38,13 @@ const Goals = () => {
 
   const addMockGoal = async () => {
     const newGoal = {
+      user_id: user?.id,
       title: 'Nova Meta Mensal',
       target_amount: 100,
-      current_amount: Math.floor(Math.random() * 100),
+      current_amount: 0,
       unit: 'itens',
       platform: 'Geral',
-      notes: 'Clique para editar (em desenvolvimento)'
+      notes: 'Clique para editar'
     };
 
     try {

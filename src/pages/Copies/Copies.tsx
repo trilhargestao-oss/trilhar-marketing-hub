@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Star, Copy as CopyIcon, Check, Plus, Trash2, X } from 'lucide-react';
 import { supabase } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import './Copies.css';
 
 interface CopyItem {
@@ -19,6 +20,7 @@ interface CopyItem {
 const FORMATS = ['Feed', 'Reels', 'Carrossel', 'Stories', 'TikTok', 'Shorts', 'Artigo', 'LinkedIn'];
 
 const Copies = () => {
+  const { user } = useAuth();
   const [copies, setCopies] = useState<CopyItem[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -74,6 +76,7 @@ const Copies = () => {
     
     // Clean fields that might be empty or missing from old migrations
     const saveData = {
+      user_id: user?.id,
       title: selectedCopy.title || 'Sem Título',
       content: selectedCopy.content || '',
       platform: selectedCopy.platform || 'Instagram',

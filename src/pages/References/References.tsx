@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, ExternalLink, Globe, Trash2 } from 'lucide-react';
 import { supabase } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import './References.css';
 
 interface Reference {
@@ -13,6 +14,7 @@ interface Reference {
 }
 
 const References = () => {
+  const { user } = useAuth();
   const [refs, setRefs] = useState<Reference[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,7 @@ const References = () => {
 
   const addMockRef = async () => {
     const newRef = {
+      user_id: user?.id,
       title: 'Nova Referência Visual',
       url: 'https://exemplo.com',
       platform: 'Web',
