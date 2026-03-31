@@ -1,7 +1,6 @@
-import { useState, useEffect, Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { supabase } from './services/supabase';
-import type { Session } from '@supabase/supabase-js';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 import Layout from './components/layout/Layout';
 import Identity from './pages/Identity/Identity';
@@ -14,6 +13,7 @@ import Content from './pages/Content/Content';
 import Calendar from './pages/Calendar/Calendar';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Login from './pages/Login/Login';
+import TeamView from './pages/TeamView/TeamView';
 
 // Componente para capturar erros fatais e evitar tela preta
 class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: any}> {
@@ -40,24 +40,8 @@ class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean,
   }
 }
 
-function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    }).catch(() => {
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+function AppRoutes() {
+  const { session, loading } = useAuth();
 
   if (loading) {
     return (
@@ -89,9 +73,20 @@ function App() {
             <Route path="goals" element={<Goals />} />
             <Route path="references" element={<References />} />
             <Route path="identity" element={<Identity />} />
+            <Route path="team" element={<TeamView />} />
           </Route>
         </Routes>
       </BrowserRouter>
+    </ErrorBoundary>
+  );
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

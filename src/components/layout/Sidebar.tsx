@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   Home,
   Calendar, 
@@ -13,7 +14,8 @@ import {
   Palette,
   ChevronLeft,
   Menu,
-  LogOut
+  LogOut,
+  Users
 } from 'lucide-react';
 import './Layout.css';
 
@@ -35,6 +37,7 @@ const NAV_ITEMS = [
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
+  const { isAdmin } = useAuth();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -59,6 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
             <NavLink 
               key={item.path}
               to={item.path}
+              end={item.path === '/'}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
               <div className="nav-icon">
@@ -68,6 +72,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
             </NavLink>
           );
         })}
+
+        {isAdmin && (
+          <NavLink 
+            to="/team"
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          >
+            <div className="nav-icon" style={{ color: '#10b981' }}>
+              <Users size={20} />
+            </div>
+            <span className="nav-label" style={{ color: '#10b981' }}>Visão da Equipe</span>
+          </NavLink>
+        )}
       </nav>
 
       <div style={{ padding: '20px', borderTop: '1px solid var(--border-color)', marginTop: 'auto' }}>
