@@ -20,14 +20,24 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    console.log("App: Iniciando verificação de sessão...");
+    
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("App: Erro ao buscar sessão:", error);
+      }
+      console.log("App: Sessão recuperada:", session ? "Logado" : "Deslogado");
       setSession(session);
+      setLoading(false);
+    }).catch(err => {
+      console.error("App: Erro fatal ao buscar sessão:", err);
       setLoading(false);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("App: Estado de autenticação alterado:", _event);
       setSession(session);
     });
 
@@ -36,8 +46,19 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f1117', color: '#94a3b8' }}>
-        Iniciando ambiente seguro...
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        background: '#1a1d27', 
+        color: '#ffffff',
+        fontFamily: 'sans-serif'
+      }}>
+        <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '10px' }}>Trilhar Marketing Hub</div>
+        <div style={{ color: '#94a3b8' }}>Iniciando ambiente seguro...</div>
+        <div style={{ marginTop: '20px', fontSize: '12px', color: '#4b5563' }}>Se esta tela persistir, verifique a conexão com o banco de dados.</div>
       </div>
     );
   }

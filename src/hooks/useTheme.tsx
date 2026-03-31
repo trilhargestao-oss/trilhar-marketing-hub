@@ -41,8 +41,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<ThemeState>(() => {
-    const saved = localStorage.getItem('trilhar_theme');
-    return saved ? { ...defaultTheme, ...JSON.parse(saved) } : defaultTheme;
+    try {
+      const saved = localStorage.getItem('trilhar_theme');
+      return saved ? { ...defaultTheme, ...JSON.parse(saved) } : defaultTheme;
+    } catch (e) {
+      console.error("Erro ao carregar tema do localStorage:", e);
+      return defaultTheme;
+    }
   });
 
   useEffect(() => {
