@@ -3,7 +3,7 @@ import { supabase } from '../services/supabase';
 import type { Session, User } from '@supabase/supabase-js';
 
 // E-mail do admin (conta Trilhar) — tem acesso à Visão da Equipe
-const ADMIN_EMAIL = 'contato@trilhar.com';
+const ADMIN_EMAIL = 'trilhargestao@gmail.com';
 
 interface AuthContextType {
   session: Session | null;
