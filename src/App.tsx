@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { supabase } from './services/supabase';
 import type { Session } from '@supabase/supabase-js';
@@ -14,6 +15,32 @@ import Content from './pages/Content/Content';
 import Calendar from './pages/Calendar/Calendar';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Login from './pages/Login/Login';
+
+// Componente simples para capturar erros fatais
+class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: any}> {
+  constructor(props: {children: ReactNode}) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: any, errorInfo: ErrorInfo) {
+    console.error("ERRO FATAL DETECTADO:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '20px', background: '#450a0a', color: '#fecaca', height: '100vh', fontFamily: 'monospace' }}>
+          <h1>Algo deu errado no React</h1>
+          <pre>{this.state.error?.toString()}</pre>
+          <p>Tente recarregar a página ou verifique os logs no console.</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -37,7 +64,7 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("App: Estado de autenticação alterado:", _event);
+      console.log("App: Estado de autenticação alterado:", _event, session ? "Com Sessão" : "Sem Sessão");
       setSession(session);
     });
 
@@ -64,25 +91,31 @@ function App() {
   }
 
   if (!session) {
-    return <Login />;
+    return (
+      <ErrorBoundary>
+        <Login />
+      </ErrorBoundary>
+    );
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="calendar" element={<Calendar />} />
-          <Route path="content" element={<Content />} />
-          <Route path="copies" element={<Copies />} />
-          <Route path="hashtags" element={<Hashtags />} />
-          <Route path="metrics" element={<Metrics />} />
-          <Route path="goals" element={<Goals />} />
-          <Route path="references" element={<References />} />
-          <Route path="identity" element={<Identity />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="content" element={<Content />} />
+            <Route path="copies" element={<Copies />} />
+            <Route path="hashtags" element={<Hashtags />} />
+            <Route path="metrics" element={<Metrics />} />
+            <Route path="goals" element={<Goals />} />
+            <Route path="references" element={<References />} />
+            <Route path="identity" element={<Identity />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 
