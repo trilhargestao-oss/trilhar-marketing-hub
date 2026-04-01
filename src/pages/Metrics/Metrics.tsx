@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Heart, Eye, Plus, Globe, MessageSquare, Briefcase, Trash2, Users, MousePointerClick } from 'lucide-react';
 import { supabase } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import './Metrics.css';
 
 interface MetricRecord {
@@ -22,6 +23,7 @@ interface MetricRecord {
 }
 
 const Metrics = () => {
+  const { user } = useAuth();
   const [records, setRecords] = useState<MetricRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -83,7 +85,7 @@ const Metrics = () => {
     if (!formData.post_title) return alert("Preencha a identificação!");
 
     try {
-      const { data, error } = await supabase.from('metrics').insert([formData]).select();
+      const { data, error } = await supabase.from('metrics').insert([{ ...formData, user_id: user?.id }]).select();
       if (error) throw error;
       if (data) setRecords([data[0] as MetricRecord, ...records]);
       setIsModalOpen(false);
