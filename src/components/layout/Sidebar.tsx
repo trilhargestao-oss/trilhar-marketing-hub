@@ -50,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       <div className="sidebar-header">
         <div className="brand-container">
           <div className="brand-logo">
-            <img src="/favicon.svg" alt="Logo Trilhar" className="brand-logo-image" />
+            <img src="/trilhar-logo.png" alt="Logo Trilhar" className="brand-logo-image" />
           </div>
           <span className="brand-name">{theme.brandName} Hub</span>
         </div>
