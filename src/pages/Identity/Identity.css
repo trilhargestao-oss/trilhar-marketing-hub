@@ -132,3 +132,127 @@
   gap: 12px;
   align-items: center;
 }
+
+.theme-preview {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 240px;
+}
+
+.theme-preview-sidebar {
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-preview-brand {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.theme-preview-nav-item {
+  color: var(--text-secondary);
+  border-left: 3px solid transparent;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.theme-preview-nav-item.active {
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+.theme-preview-main {
+  background: var(--bg-main);
+  padding: 20px;
+}
+
+.theme-preview-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 16px;
+}
+
+.theme-preview-card h4 {
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.theme-preview-card p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.theme-preview-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.theme-preview-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+@media (max-width: 768px) {
+  .identity-container {
+    gap: 20px;
+  }
+
+  .identity-header {
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .header-actions .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .identity-grid {
+    gap: 16px;
+  }
+
+  .identity-section {
+    padding: 18px;
+  }
+
+  .identity-section h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .theme-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-preview-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+}

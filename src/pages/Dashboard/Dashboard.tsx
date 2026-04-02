@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
-import { Calendar, PenTool, Hash, Target, type LucideIcon, Rocket, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, PenTool, Hash, Target, type LucideIcon, Rocket, Clock, CheckCircle, Activity, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import './Dashboard.css';
@@ -9,8 +9,9 @@ interface DashboardStats {
   todayPosts: any[];
   scheduledMonth: number;
   publishedMonth: number;
-  totalCopies: number;
-  activeGoals: number;
+  latestCopies: any[];
+  activeGoals: any[];
+  recentMetrics: any[];
   latestFollowers: number;
 }
 
@@ -20,8 +21,9 @@ const Dashboard = () => {
     todayPosts: [],
     scheduledMonth: 0,
     publishedMonth: 0,
-    totalCopies: 0,
-    activeGoals: 0,
+    latestCopies: [],
+    activeGoals: [],
+    recentMetrics: [],
     latestFollowers: 0
   });
   const [loading, setLoading] = useState(true);
@@ -54,22 +56,26 @@ const Dashboard = () => {
       const scheduled = monthP?.filter(p => p.status === 'scheduled').length || 0;
       const published = monthP?.filter(p => p.status === 'published').length || 0;
 
-      // Fetch Copies Count
-      const { count: copiesCount } = await supabase
+      // Fetch latest copies
+      const { data: copiesData } = await supabase
         .from('copies')
-        .select('*', { count: 'exact', head: true });
+        .select('id, title, platform, format')
+        .order('created_at', { ascending: false })
+        .limit(4);
 
-      // Fetch Active Goals
-      const { count: goalsCount } = await supabase
+      // Fetch goals in progress
+      const { data: goalsData } = await supabase
         .from('goals')
-        .select('*', { count: 'exact', head: true });
+        .select('id, title, current_amount, target_amount, unit')
+        .order('created_at', { ascending: false })
+        .limit(4);
 
       // Fetch Latest Followers Metric
       const { data: latestM } = await supabase
         .from('metrics')
-        .select('followers_total')
+        .select('followers_total, post_date, reach, likes, platform')
         .order('post_date', { ascending: false })
-        .limit(1);
+        .limit(4);
       
       const lastF = latestM?.[0]?.followers_total || 0;
 
@@ -77,8 +83,9 @@ const Dashboard = () => {
         todayPosts: todayP || [],
         scheduledMonth: scheduled,
         publishedMonth: published,
-        totalCopies: copiesCount || 0,
-        activeGoals: goalsCount || 0,
+        latestCopies: copiesData || [],
+        activeGoals: goalsData || [],
+        recentMetrics: latestM || [],
         latestFollowers: lastF
       });
     } catch (err) {
@@ -136,7 +143,7 @@ const Dashboard = () => {
           {/* Section 2: Resumo do Mês */}
           <div className="dash-section">
             <h3 className="dash-section-title">
-              <Target size={20} /> Visão Geral (Histórico)
+              <Target size={20} /> Visão Geral do Mês
             </h3>
             
             <div className="dash-stat-row">
@@ -151,13 +158,62 @@ const Dashboard = () => {
               <span className="dash-stat-label">Posts Publicados (Mês)</span>
               <span className="dash-stat-value">{stats.publishedMonth}</span>
             </div>
-            <div className="dash-stat-row">
-              <span className="dash-stat-label">Ideias e Copies salvas</span>
-              <span className="dash-stat-value">{stats.totalCopies}</span>
+          </div>
+
+          <div className="dash-section">
+            <h3 className="dash-section-title">
+              <PenTool size={20} /> Últimos Copies Salvos
+            </h3>
+            <div className="dashboard-list">
+              {stats.latestCopies.length === 0 && <p className="dashboard-empty">Nenhuma copy salva ainda.</p>}
+              {stats.latestCopies.map((copy) => (
+                <div key={copy.id} className="dashboard-list-item">
+                  <div>
+                    <p className="dashboard-item-title">{copy.title}</p>
+                    <p className="dashboard-item-sub">{copy.platform} • {copy.format || 'Feed'}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Section 3: Atalhos */}
+          <div className="dash-section">
+            <h3 className="dash-section-title">
+              <Activity size={20} /> Metas em Andamento
+            </h3>
+            <div className="dashboard-list">
+              {stats.activeGoals.length === 0 && <p className="dashboard-empty">Nenhuma meta cadastrada.</p>}
+              {stats.activeGoals.map((goal) => {
+                const progress = goal.target_amount ? Math.min(100, Math.round((goal.current_amount / goal.target_amount) * 100)) : 0;
+                return (
+                  <div key={goal.id} className="dashboard-list-item">
+                    <p className="dashboard-item-title">{goal.title}</p>
+                    <p className="dashboard-item-sub">{goal.current_amount}/{goal.target_amount} {goal.unit}</p>
+                    <div className="dashboard-progress">
+                      <span style={{ width: `${progress}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="dash-section">
+            <h3 className="dash-section-title">
+              <BarChart3 size={20} /> Métricas Recentes
+            </h3>
+            <div className="dashboard-list">
+              {stats.recentMetrics.length === 0 && <p className="dashboard-empty">Nenhum registro recente.</p>}
+              {stats.recentMetrics.map((metric, idx) => (
+                <div key={`${metric.post_date}-${idx}`} className="dashboard-list-item">
+                  <p className="dashboard-item-title">{metric.platform || 'Canal'} • {metric.post_date}</p>
+                  <p className="dashboard-item-sub">Reach {metric.reach || 0} • Likes {metric.likes || 0} • Seguidores {metric.followers_total || 0}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 6: Atalhos */}
           <div className="dash-section">
             <h3 className="dash-section-title">
               <Rocket size={20} /> Acesso Rápido

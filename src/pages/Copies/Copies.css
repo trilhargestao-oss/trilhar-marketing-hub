@@ -140,6 +140,7 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
 }
 
 .copy-modal-header {
@@ -159,8 +160,56 @@
 }
 
 @media (max-width: 768px) {
+  .copies-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .copies-header .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .masonry-grid {
+    column-gap: 14px;
+  }
+
+  .pinterest-card {
+    padding: 14px;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+
+  .copy-modal-overlay {
+    padding: 10px;
+  }
+
+  .copy-modal-content {
+    max-height: 92vh;
+  }
+
+  .copy-modal-header {
+    padding: 14px 16px;
+    position: sticky;
+    top: 0;
+    background: var(--bg-main);
+    z-index: 3;
+  }
+
   .copy-modal-body {
     grid-template-columns: 1fr;
+    padding: 14px 16px;
+    gap: 14px;
+  }
+
+  .copy-modal-sidebar {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .copy-textarea {
+    min-height: 220px;
   }
 }
 

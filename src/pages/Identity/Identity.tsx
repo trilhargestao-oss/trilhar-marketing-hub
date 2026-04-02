@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Palette, Type, LayoutTemplate, Save, RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Palette, Type, LayoutTemplate, Save, RefreshCw, PanelsTopLeft } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import './Identity.css';
 
@@ -7,6 +7,7 @@ const DEFAULT_THEME = {
   primaryColor: '#7c3aed',
   secondaryColor: '#10b981',
   dangerColor: '#ef4444',
+  buttonTextColor: '#ffffff',
   bgMain: '#0f1117',
   bgCard: '#1a1d27',
   bgSidebar: '#13151f',
@@ -32,12 +33,20 @@ const Identity = () => {
   const { theme, updateTheme } = useTheme();
   const [localTheme, setLocalTheme] = useState(theme);
 
+  useEffect(() => {
+    setLocalTheme(theme);
+  }, [theme]);
+
   const handleChange = (key: keyof typeof theme, value: string) => {
-    setLocalTheme(prev => ({ ...prev, [key]: value }));
+    const nextTheme = { ...localTheme, [key]: value };
+    setLocalTheme(nextTheme);
+    // Preview em tempo real em toda a aplicação
+    updateTheme(nextTheme);
   };
 
   const handleSave = () => {
     updateTheme(localTheme);
+    alert('Tema aplicado com sucesso.');
   };
 
   const handleReset = () => {
@@ -156,6 +165,14 @@ const Identity = () => {
             </div>
 
             <div className="control-group">
+              <label>Texto dos Botões</label>
+              <div className="color-picker-wrap">
+                <input type="color" className="color-input-bubble" value={localTheme.buttonTextColor} onChange={e => handleChange('buttonTextColor', e.target.value)} />
+                <span className="color-hex">{localTheme.buttonTextColor}</span>
+              </div>
+            </div>
+
+            <div className="control-group">
               <label>Cor Secundária (Sucesso/Avisos)</label>
               <div className="color-picker-wrap">
                 <input type="color" className="color-input-bubble" value={localTheme.secondaryColor} onChange={e => handleChange('secondaryColor', e.target.value)} />
@@ -184,6 +201,28 @@ const Identity = () => {
               <div className="color-picker-wrap" style={{ maxWidth: '300px' }}>
                 <input type="color" className="color-input-bubble" value={localTheme.borderColor} onChange={e => handleChange('borderColor', e.target.value)} />
                 <span className="color-hex">{localTheme.borderColor}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="identity-section">
+          <h3><PanelsTopLeft size={20} color="var(--color-primary)" /> Preview em Tempo Real</h3>
+          <div className="theme-preview">
+            <aside className="theme-preview-sidebar">
+              <div className="theme-preview-brand">Trilhar</div>
+              <div className="theme-preview-nav-item active">Dashboard</div>
+              <div className="theme-preview-nav-item">Calendario</div>
+              <div className="theme-preview-nav-item">Metas</div>
+            </aside>
+            <div className="theme-preview-main">
+              <div className="theme-preview-card">
+                <h4>Titulo do card</h4>
+                <p>Texto secundario para validar contraste e legibilidade.</p>
+                <div className="theme-preview-actions">
+                  <button className="btn-primary">Botao primario</button>
+                  <button className="theme-preview-ghost">Botao secundario</button>
+                </div>
               </div>
             </div>
           </div>

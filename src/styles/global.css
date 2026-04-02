@@ -12,6 +12,7 @@
   --color-success: #10b981;
   --color-danger: #ef4444;
   --color-warning: #f59e0b; /* Pra pendentes, extra */
+  --button-text-color: #ffffff;
   
   /* Textos e Bordas */
   --text-primary: #f1f5f9;
@@ -31,7 +32,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-family, 'Inter', sans-serif);
   background-color: var(--bg-main);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -65,9 +66,10 @@ body {
 
 .main-content {
   flex: 1;
-  padding: 32px;
+  padding: 28px 32px 40px;
   margin-left: var(--sidebar-width);
   transition: margin-left var(--transition-speed) ease;
+  min-height: 100vh;
 }
 
 .main-content.collapsed {
@@ -105,6 +107,7 @@ button {
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 40px;
 }
 
 .btn-primary {
@@ -113,7 +116,7 @@ button {
   justify-content: center;
   gap: 8px;
   background-color: var(--color-primary);
-  color: #ffffff;
+  color: var(--button-text-color);
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -140,8 +143,8 @@ button {
   color: var(--text-secondary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   transition: all 0.2s;
 }
 
@@ -224,4 +227,42 @@ button {
   background: rgba(124, 58, 237, 0.1);
   color: var(--color-primary);
   border-color: rgba(124, 58, 237, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 20px 20px 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 76px;
+    --sidebar-collapsed-width: 76px;
+  }
+
+  .main-content,
+  .main-content.collapsed {
+    margin-left: var(--sidebar-width);
+    padding: 16px 14px 24px;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  button,
+  .btn-primary,
+  .form-control,
+  .identity-input {
+    min-height: 44px;
+  }
 }

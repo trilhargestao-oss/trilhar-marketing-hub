@@ -112,3 +112,36 @@
 .platform-icon {
   color: var(--color-primary);
 }
+
+@media (max-width: 768px) {
+  .metrics-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .metrics-header .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .metrics-summary {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .metric-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .metric-value {
+    font-size: 20px;
+  }
+
+  .metrics-table th,
+  .metrics-table td {
+    padding: 12px 10px;
+    font-size: 12px;
+  }
+}

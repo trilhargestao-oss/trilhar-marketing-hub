@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Heart, Eye, Plus, Globe, MessageSquare, Briefcase, Trash2, Users, MousePointerClick } from 'lucide-react';
-import { supabase } from '../../services/supabase';
+import { hasRealSupabase, supabase } from '../../services/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import './Metrics.css';
 
@@ -83,14 +83,17 @@ const Metrics = () => {
 
   const handleSaveMetric = async () => {
     if (!formData.post_title) return alert("Preencha a identificação!");
+    if (!user?.id) return alert('Sua sessão expirou. Faça login novamente para salvar métricas.');
+    if (!hasRealSupabase) return alert('Configuração do Supabase ausente. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.');
 
     try {
-      const { data, error } = await supabase.from('metrics').insert([{ ...formData, user_id: user?.id }]).select();
+      const { data, error } = await supabase.from('metrics').insert([{ ...formData, user_id: user.id }]).select();
       if (error) throw error;
       if (data) setRecords([data[0] as MetricRecord, ...records]);
       setIsModalOpen(false);
     } catch (err) {
-      alert('Erro ao salvar no banco de dados.');
+      console.error('Erro ao salvar métrica:', err);
+      alert(`Erro ao salvar no banco de dados: ${err instanceof Error ? err.message : 'falha desconhecida'}`);
     }
   };
 

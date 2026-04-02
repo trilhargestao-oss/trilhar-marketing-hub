@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../hooks/useTheme';
 import { 
   Home,
   Calendar, 
@@ -38,6 +39,7 @@ const NAV_ITEMS = [
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
   const { isAdmin } = useAuth();
+  const { theme } = useTheme();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -47,8 +49,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
         <div className="brand-container">
-          <div className="brand-logo">T</div>
-          <span className="brand-name">Marketing Hub</span>
+          <div className="brand-logo">
+            <img src="/favicon.svg" alt="Logo Trilhar" className="brand-logo-image" />
+          </div>
+          <span className="brand-name">{theme.brandName} Hub</span>
         </div>
         <button className="toggle-btn" onClick={onToggle} title="Alternar Menu">
           {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
@@ -76,21 +80,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
         {isAdmin && (
           <NavLink 
             to="/team"
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `nav-item nav-item-team ${isActive ? 'active' : ''}`}
           >
-            <div className="nav-icon" style={{ color: '#10b981' }}>
+            <div className="nav-icon">
               <Users size={20} />
             </div>
-            <span className="nav-label" style={{ color: '#10b981' }}>Visão da Equipe</span>
+            <span className="nav-label">Visão da Equipe</span>
           </NavLink>
         )}
       </nav>
 
-      <div style={{ padding: '20px', borderTop: '1px solid var(--border-color)', marginTop: 'auto' }}>
+      <div className="sidebar-footer">
         <button 
           onClick={handleLogout}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '16px', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '12px 0' }}
-          className="nav-item"
+          className="nav-item nav-item-logout"
         >
           <div className="nav-icon">
             <LogOut size={20} />

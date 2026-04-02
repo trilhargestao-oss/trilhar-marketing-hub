@@ -4,6 +4,7 @@ interface ThemeState {
   primaryColor: string;
   secondaryColor: string;
   dangerColor: string;
+  buttonTextColor: string;
   bgMain: string;
   bgCard: string;
   bgSidebar: string;
@@ -25,6 +26,7 @@ const defaultTheme: ThemeState = {
   primaryColor: '#7c3aed', // Roxo base
   secondaryColor: '#10b981', // Verde sucesso
   dangerColor: '#ef4444',
+  buttonTextColor: '#ffffff',
   bgMain: '#0f1117',
   bgCard: '#1a1d27',
   bgSidebar: '#13151f',
@@ -59,6 +61,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     root.style.setProperty('--color-secondary', theme.secondaryColor);
     root.style.setProperty('--color-danger', theme.dangerColor);
     root.style.setProperty('--color-success', theme.secondaryColor); // usando secundária para sucesso por padrão
+    root.style.setProperty('--button-text-color', theme.buttonTextColor);
     
     root.style.setProperty('--bg-main', theme.bgMain);
     root.style.setProperty('--bg-card', theme.bgCard);

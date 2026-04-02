@@ -5,7 +5,7 @@ import {
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, X, Bell, CheckCircle } from 'lucide-react';
-import { supabase } from '../../services/supabase';
+import { hasRealSupabase, supabase } from '../../services/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import './Calendar.css';
 
@@ -80,6 +80,8 @@ const Calendar = () => {
 
   const savePost = async () => {
     if(!selectedDate || !formData.title) return;
+    if (!user?.id) return alert('Sua sessão expirou. Faça login novamente para salvar posts.');
+    if (!hasRealSupabase) return alert('Configuração do Supabase ausente. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.');
     
     if (formData.remind_me) {
       requestNotificationPermission();
@@ -87,7 +89,7 @@ const Calendar = () => {
 
     try {
       const newPost = {
-        user_id: user?.id,
+        user_id: user.id,
         title: formData.title,
         platform: formData.platform,
         type: formData.type,
@@ -107,7 +109,7 @@ const Calendar = () => {
       }
     } catch (err) {
       console.error('Erro ao salvar post:', err);
-      alert('Erro ao salvar no banco de dados.');
+      alert(`Erro ao salvar no banco de dados: ${err instanceof Error ? err.message : 'falha desconhecida'}`);
     }
   };
 

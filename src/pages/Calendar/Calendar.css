@@ -165,6 +165,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 12px;
 }
 
 .modal-content {
@@ -175,6 +176,8 @@
   max-width: 500px;
   display: flex;
   flex-direction: column;
+  max-height: 92vh;
+  overflow: hidden;
 }
 
 .modal-header {
@@ -202,6 +205,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
 }
 
 .modal-footer {
@@ -210,4 +214,77 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  background: var(--bg-card);
+}
+
+@media (max-width: 768px) {
+  .calendar-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .calendar-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .current-month {
+    min-width: auto;
+    font-size: 15px;
+  }
+
+  .calendar-stats {
+    width: 100%;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 4px;
+  }
+
+  .stat-badge {
+    white-space: nowrap;
+  }
+
+  .calendar-grid {
+    grid-auto-rows: minmax(90px, auto);
+  }
+
+  .weekday {
+    font-size: 11px;
+    padding: 10px 4px;
+  }
+
+  .calendar-day {
+    min-height: 90px;
+    padding: 6px;
+  }
+
+  .post-pill {
+    font-size: 10px;
+    padding: 3px 5px;
+  }
+
+  .modal-content {
+    max-width: 100%;
+    border-radius: 14px;
+  }
+
+  .modal-header {
+    padding: 16px;
+  }
+
+  .modal-title {
+    font-size: 16px;
+  }
+
+  .modal-body {
+    padding: 14px 16px 8px;
+  }
+
+  .modal-footer {
+    position: sticky;
+    bottom: 0;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    backdrop-filter: blur(8px);
+  }
 }
