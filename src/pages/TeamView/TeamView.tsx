@@ -63,11 +63,11 @@ const TeamView = () => {
 
     for (const member of team) {
       const [metricsRes, goalsRes] = await Promise.all([
-        supabase.from('metrics').select('followers_total, reach').eq('user_id', member.member_user_id).order('post_date', { ascending: false }).limit(5),
+        supabase.from('metrics').select('*').eq('user_id', member.member_user_id).order('post_date', { ascending: false }).limit(5),
         supabase.from('goals').select('target_amount, current_amount').eq('user_id', member.member_user_id),
       ]);
 
-      const latestFollowers = metricsRes.data?.[0]?.followers_total || 0;
+      const latestFollowers = metricsRes.data?.[0]?.followers_total || metricsRes.data?.[0]?.followers || 0;
       const reachAvg = metricsRes.data ? Math.round(metricsRes.data.reduce((acc, m) => acc + (m.reach || 0), 0) / Math.max(metricsRes.data.length, 1)) : 0;
       const totalGoals = goalsRes.data?.length || 0;
       const completedGoals = goalsRes.data?.filter(g => g.current_amount >= g.target_amount).length || 0;

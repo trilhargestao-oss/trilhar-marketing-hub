@@ -73,11 +73,11 @@ const Dashboard = () => {
       // Fetch Latest Followers Metric
       const { data: latestM } = await supabase
         .from('metrics')
-        .select('followers_total, post_date, reach, likes, platform')
+        .select('*')
         .order('post_date', { ascending: false })
         .limit(4);
       
-      const lastF = latestM?.[0]?.followers_total || 0;
+      const lastF = latestM?.[0]?.followers_total || latestM?.[0]?.followers || 0;
 
       setStats({
         todayPosts: todayP || [],
@@ -207,7 +207,7 @@ const Dashboard = () => {
               {stats.recentMetrics.map((metric, idx) => (
                 <div key={`${metric.post_date}-${idx}`} className="dashboard-list-item">
                   <p className="dashboard-item-title">{metric.platform || 'Canal'} • {metric.post_date}</p>
-                  <p className="dashboard-item-sub">Reach {metric.reach || 0} • Likes {metric.likes || 0} • Seguidores {metric.followers_total || 0}</p>
+                  <p className="dashboard-item-sub">Reach {metric.reach || 0} • Likes {metric.likes || 0} • Seguidores {metric.followers_total || metric.followers || 0}</p>
                 </div>
               ))}
             </div>

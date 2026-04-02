@@ -33,6 +33,11 @@ const getReadableError = (err: unknown) => {
   return String(err);
 };
 
+const getMissingColumn = (message: string) => {
+  const match = message.match(/Could not find the '([^']+)' column/i);
+  return match?.[1] || null;
+};
+
 const Metrics = () => {
   const { user } = useAuth();
   const [records, setRecords] = useState<MetricRecord[]>([]);
@@ -98,9 +103,28 @@ const Metrics = () => {
     if (!hasRealSupabase) return alert('Configuração do Supabase ausente. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.');
 
     try {
-      const { data, error } = await supabase.from('metrics').insert([{ ...formData, user_id: user.id }]).select();
-      if (error) throw error;
-      if (data) setRecords([data[0] as MetricRecord, ...records]);
+      const payload: Record<string, unknown> = { ...formData, user_id: user.id };
+      let insertedData: unknown[] | null = null;
+      let lastError: unknown = null;
+
+      // Compatibilidade com schemas antigos: remove colunas inexistentes e tenta novamente.
+      for (let attempt = 0; attempt < 6; attempt += 1) {
+        const { data, error } = await supabase.from('metrics').insert([payload]).select();
+        if (!error) {
+          insertedData = data;
+          lastError = null;
+          break;
+        }
+
+        lastError = error;
+        const message = getReadableError(error);
+        const missingColumn = getMissingColumn(message);
+        if (!missingColumn || !(missingColumn in payload)) break;
+        delete payload[missingColumn];
+      }
+
+      if (lastError) throw lastError;
+      if (insertedData && insertedData.length > 0) setRecords([insertedData[0] as MetricRecord, ...records]);
       setIsModalOpen(false);
     } catch (err) {
       console.error('Erro ao salvar métrica:', err);
