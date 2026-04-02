@@ -21,6 +21,17 @@ interface Post {
   briefing: string;
 }
 
+const getReadableError = (err: unknown) => {
+  if (!err) return 'falha desconhecida';
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === 'object') {
+    const maybe = err as { message?: string; details?: string; hint?: string };
+    const parts = [maybe.message, maybe.details, maybe.hint].filter(Boolean);
+    if (parts.length > 0) return parts.join(' | ');
+  }
+  return String(err);
+};
+
 const Calendar = () => {
   const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -109,7 +120,7 @@ const Calendar = () => {
       }
     } catch (err) {
       console.error('Erro ao salvar post:', err);
-      alert(`Erro ao salvar no banco de dados: ${err instanceof Error ? err.message : 'falha desconhecida'}`);
+      alert(`Erro ao salvar no banco de dados: ${getReadableError(err)}`);
     }
   };
 

@@ -22,6 +22,17 @@ interface MetricRecord {
   metric_type: 'post' | 'account';
 }
 
+const getReadableError = (err: unknown) => {
+  if (!err) return 'falha desconhecida';
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === 'object') {
+    const maybe = err as { message?: string; details?: string; hint?: string };
+    const parts = [maybe.message, maybe.details, maybe.hint].filter(Boolean);
+    if (parts.length > 0) return parts.join(' | ');
+  }
+  return String(err);
+};
+
 const Metrics = () => {
   const { user } = useAuth();
   const [records, setRecords] = useState<MetricRecord[]>([]);
@@ -93,7 +104,7 @@ const Metrics = () => {
       setIsModalOpen(false);
     } catch (err) {
       console.error('Erro ao salvar métrica:', err);
-      alert(`Erro ao salvar no banco de dados: ${err instanceof Error ? err.message : 'falha desconhecida'}`);
+      alert(`Erro ao salvar no banco de dados: ${getReadableError(err)}`);
     }
   };
 
